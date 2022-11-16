@@ -1,0 +1,39 @@
+name: 'Dockerize App'
+description: 'Greet someone and record the time'
+inputs:
+  github-token:
+    description: 'GH Token'
+    required: false
+  build:
+    description: 'Build docker image'
+    required: true
+    default: true
+  docker-file:
+    description: 'Docker file path'
+    required: false
+  build-path:
+    description: 'Path'
+    required: true
+    default: '.'  
+  publish:
+    description: 'Publish?'
+    required: false
+    default: true
+  package-name:
+    description: 'Pacakge name'
+    required: true
+  owner:
+    description: 'Organization owner'
+    required: true
+    default: GETYUGO
+  clean:
+    description: 'Clean non tagged images'
+    required: false
+    default: true
+  tag:
+    description: 'Docker image tag'
+    required: true
+runs:
+  using: 'node16'
+  main: 'index.js'
+  # post: 'clean.js'
