@@ -15,11 +15,11 @@ const clean = async function(owner, packageName) {
   const response = await octokit.request(`GET /orgs/${owner}/packages/container/${packageName}/versions`, { per_page: 100 });
 
   for(version of response.data) {
-      if (version.metadata.container.tags.length == 0) {
-          console.log("Deleting " + version.id)
-          const deleteResponse = await octokit.request(`DELETE /orgs/${owner}/packages/container/${packageName}/versions/${version.id}`, { });
-          console.log("Deletion " + deleteResponse.status)
-      }
+    if (version.metadata.container.tags.length == 0) {
+      console.log("Deleting " + version.id);
+      const deleteResponse = await octokit.request(`DELETE /orgs/${owner}/packages/container/${packageName}/versions/${version.id}`, { });
+      console.log("Deletion " + deleteResponse.status);
+    }
   }
 }
 
@@ -28,11 +28,11 @@ const deleteTag = async function(owner, packageName, tag) {
 
   for(version of response.data) {
     if (version.metadata.container.tags.includes(tag)) {
-        console.log("Deleting tag " + tag)
-        const deleteResponse = await github.request(`DELETE /orgs/${owner}/packages/container/${packageName}/versions/${version.id}`, { });
-        console.log("Deletion " + deleteResponse.status)
+      console.log("Deleting tag " + tag);
+      const deleteResponse = await github.request(`DELETE /orgs/${owner}/packages/container/${packageName}/versions/${version.id}`, { });
+      console.log("Deletion " + deleteResponse.status);
     }
-}
+  }
 }
 
 const run = async function() { 
@@ -47,24 +47,26 @@ const run = async function() {
     const wantsDeleteTag = core.getBooleanInput('delete-tag');
     const tag = core.getInput('tag');
     const imageName = 'ghcr.io/' + owner.toLowerCase() + '/' + packageName;
+
+    console.log(`Preparing for ${packageName}:${tag}...`)
   
     if (wantsBuild) {
-      console.log(`Building ${imageName}:${tag}...`)
+      console.log(`Building ${packageName}:${tag}...`)
       await build(dockerFile, imageName, tag, buildPath);
     }
   
     if (wantsPublish) {
-      console.log(`Publishing ${imageName}:${tag}...`)
+      console.log(`Publishing ${packageName}:${tag}...`)
       await publish(imageName, tag);
     }
   
     if (wantsClean) {
-      console.log(`Deleting old ${imageName} images...`)
+      console.log(`Deleting old ${packageName} images...`)
       await clean(owner, packageName);
     }
 
     if (wantsDeleteTag) {
-      console.log(`Deleting tag ${imageName}:${tag}...`)
+      console.log(`Deleting tag ${packageName}:${tag}...`)
       await deleteTag(owner, imageName, tag);
     }
 

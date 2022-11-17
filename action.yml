@@ -1,5 +1,5 @@
 name: 'Dockerize App'
-description: 'Greet someone and record the time'
+description: 'Build & publish dockerized apps'
 inputs:
   github-token:
     description: 'GH Token'
@@ -12,15 +12,15 @@ inputs:
     description: 'Docker file path'
     required: false
   build-path:
-    description: 'Path'
+    description: 'Build Path'
     required: true
     default: '.'  
   publish:
-    description: 'Publish?'
+    description: 'Publish'
     required: false
     default: true
   package-name:
-    description: 'Pacakge name'
+    description: 'Package name'
     required: true
   owner:
     description: 'Organization owner'
