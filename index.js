@@ -12,8 +12,7 @@ const publish = async function(imageName, tag) {
 }
 
 const clean = async function(owner, packageName) {
-  const response = await octokit.request(`GET /orgs/${owner}/packages/container/${packageName}/versions`,
-    { per_page: 100 });
+  const response = await octokit.request(`GET /orgs/${owner}/packages/container/${packageName}/versions`, { per_page: 100 });
 
   for(version of response.data) {
       if (version.metadata.container.tags.length == 0) {
@@ -22,6 +21,18 @@ const clean = async function(owner, packageName) {
           console.log("Deletion " + deleteResponse.status)
       }
   }
+}
+
+const deleteTag = async function(owner, packageName, tag) {
+  const response = await octokit.request(`GET /orgs/${owner}/packages/container/${packageName}/versions`, { per_page: 100 });
+
+  for(version of response.data) {
+    if (version.metadata.container.tags.includes(tag)) {
+        console.log("Deleting tag " + tag)
+        const deleteResponse = await github.request(`DELETE /orgs/${owner}/packages/container/${packageName}/versions/${version.id}`, { });
+        console.log("Deletion " + deleteResponse.status)
+    }
+}
 }
 
 const run = async function() { 
@@ -33,6 +44,7 @@ const run = async function() {
     const buildPath = core.getInput('build-path');
     const wantsPublish = core.getBooleanInput('publish');
     const wantsClean = core.getBooleanInput('clean');
+    const wantsDeleteTag = core.getBooleanInput('delete-tag');
     const tag = core.getInput('tag');
     const imageName = 'ghcr.io/' + owner.toLowerCase() + '/' + packageName;
   
@@ -49,6 +61,11 @@ const run = async function() {
     if (wantsClean) {
       console.log(`Deleting old ${imageName} images...`)
       await clean(owner, packageName);
+    }
+
+    if (wantsDeleteTag) {
+      console.log(`Deleting tag ${imageName}:${tag}...`)
+      await deleteTag(owner, imageName, tag);
     }
 
     console.log('Done');

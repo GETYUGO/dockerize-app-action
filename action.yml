@@ -30,6 +30,10 @@ inputs:
     description: 'Clean non tagged images'
     required: false
     default: true
+  delete-tag:
+    description: 'Delete tagged image'
+    required: false
+    default: false  
   tag:
     description: 'Docker image tag'
     required: true
