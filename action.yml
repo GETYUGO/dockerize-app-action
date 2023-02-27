@@ -37,6 +37,9 @@ inputs:
   tag:
     description: 'Docker image tag'
     required: true
+  build-args:
+    description: 'Docker build arguments'
+    required: false
 runs:
   using: 'node16'
   main: 'index.js'
