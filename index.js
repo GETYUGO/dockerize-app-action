@@ -55,7 +55,6 @@ const run = async function () {
 
     if (wantsBuild) {
 
-      console.log(buildArgs);
       console.log(`Building ${packageName}:${tag}...`)
       await build(dockerFile, imageName, tag, buildPath, buildArgs);
     }
