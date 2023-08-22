@@ -43,6 +43,10 @@ inputs:
   platform:
     description: 'Docker target platform'
     required: false
+  delete-image:
+    description: 'Delete image locally'
+    required: false
+    default: false
 runs:
   using: 'node16'
   main: 'index.js'

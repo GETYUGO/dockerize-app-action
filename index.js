@@ -39,6 +39,10 @@ const deleteTag = async function (owner, packageName, tag) {
   }
 }
 
+const deleteImage = async function (imageName, tag) {
+  await exec.exec(`docker image rm ${imageName}:${tag}`);
+}
+
 const run = async function () {
   try {
     const wantsBuild = core.getBooleanInput('build');
@@ -49,6 +53,7 @@ const run = async function () {
     const wantsPublish = core.getBooleanInput('publish');
     const wantsClean = core.getBooleanInput('clean');
     const wantsDeleteTag = core.getBooleanInput('delete-tag');
+    const wantsDeleteImage = core.getBooleanInput('delete-image');
     const tag = core.getInput('tag');
     const imageName = 'ghcr.io/' + owner.toLowerCase() + '/' + packageName;
     const buildArgs = core.getMultilineInput('build-args');
@@ -75,6 +80,11 @@ const run = async function () {
     if (wantsDeleteTag) {
       console.log(`Deleting tag ${packageName}:${tag}...`)
       await deleteTag(owner, imageName, tag);
+    }
+
+    if (wantsDeleteImage) {
+      console.log('Deleting image');
+      await deleteImage(imageName, tag);
     }
 
     console.log('Done');
