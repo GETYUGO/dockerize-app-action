@@ -5,8 +5,10 @@ const octokit = github.getOctokit(core.getInput('github-token'))
 
 const mapBuildArgs = (buildArgs) => buildArgs?.map((arg) => `--build-arg ${arg}`).join(' ') || '';
 
-const build = async function (dockerFile, imageName, tag, buildPath, buildArgs) {
-  await exec.exec(`docker build -t ${imageName}:${tag} ${mapBuildArgs(buildArgs)} -f ${dockerFile} ${buildPath}`);
+const mapPlatform = (platform) => platform ? `--platform ${platform}` : '';
+
+const build = async function (dockerFile, imageName, tag, buildPath, buildArgs, platform) {
+  await exec.exec(`docker build -t ${imageName}:${tag} ${mapPlatform(platform)} ${mapBuildArgs(buildArgs)} -f ${dockerFile} ${buildPath}`);
 }
 
 const publish = async function (imageName, tag) {
@@ -50,13 +52,14 @@ const run = async function () {
     const tag = core.getInput('tag');
     const imageName = 'ghcr.io/' + owner.toLowerCase() + '/' + packageName;
     const buildArgs = core.getMultilineInput('build-args');
+    const platform = core.getInput('platform');
 
     console.log(`Preparing for ${packageName}:${tag}...`)
 
     if (wantsBuild) {
 
       console.log(`Building ${packageName}:${tag}...`)
-      await build(dockerFile, imageName, tag, buildPath, buildArgs);
+      await build(dockerFile, imageName, tag, buildPath, buildArgs, platform);
     }
 
     if (wantsPublish) {
