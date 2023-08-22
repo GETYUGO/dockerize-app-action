@@ -7,8 +7,10 @@ const mapBuildArgs = (buildArgs) => buildArgs?.map((arg) => `--build-arg ${arg}`
 
 const mapPlatform = (platform) => platform ? `--platform ${platform}` : '';
 
-const build = async function (dockerFile, imageName, tag, buildPath, buildArgs, platform) {
-  await exec.exec(`docker build -t ${imageName}:${tag} ${mapPlatform(platform)} ${mapBuildArgs(buildArgs)} -f ${dockerFile} ${buildPath}`);
+const mapNoCache = (noCache) => noCache ? '--no-cache' : '';
+
+const build = async function (dockerFile, imageName, tag, buildPath, buildArgs, platform, noCache) {
+  await exec.exec(`docker build -t ${imageName}:${tag} ${mapPlatform(platform)} ${mapNoCache(noCache)} ${mapBuildArgs(buildArgs)} -f ${dockerFile} ${buildPath}`);
 }
 
 const publish = async function (imageName, tag) {
@@ -58,13 +60,14 @@ const run = async function () {
     const imageName = 'ghcr.io/' + owner.toLowerCase() + '/' + packageName;
     const buildArgs = core.getMultilineInput('build-args');
     const platform = core.getInput('platform');
+    const noCache = core.getBooleanInput('no-cache');
 
     console.log(`Preparing for ${packageName}:${tag}...`)
 
     if (wantsBuild) {
 
       console.log(`Building ${packageName}:${tag}...`)
-      await build(dockerFile, imageName, tag, buildPath, buildArgs, platform);
+      await build(dockerFile, imageName, tag, buildPath, buildArgs, platform, noCache);
     }
 
     if (wantsPublish) {
