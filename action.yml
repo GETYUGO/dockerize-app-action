@@ -40,6 +40,9 @@ inputs:
   build-args:
     description: 'Docker build arguments'
     required: false
+  platform:
+    description: 'Docker target platform'
+    required: false
 runs:
   using: 'node16'
   main: 'index.js'
