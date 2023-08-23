@@ -47,6 +47,10 @@ inputs:
     description: 'Delete image locally'
     required: false
     default: false
+  no-cache:
+    description: 'Don\'t use cache'
+    required: false
+    default: false
 runs:
   using: 'node16'
   main: 'index.js'
