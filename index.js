@@ -5,8 +5,12 @@ const octokit = github.getOctokit(core.getInput('github-token'))
 
 const mapBuildArgs = (buildArgs) => buildArgs?.map((arg) => `--build-arg ${arg}`).join(' ') || '';
 
-const build = async function (dockerFile, imageName, tag, buildPath, buildArgs) {
-  await exec.exec(`docker build -t ${imageName}:${tag} ${mapBuildArgs(buildArgs)} -f ${dockerFile} ${buildPath}`);
+const mapPlatform = (platform) => platform ? `--platform ${platform}` : '';
+
+const mapNoCache = (noCache) => noCache ? '--no-cache' : '';
+
+const build = async function (dockerFile, imageName, tag, buildPath, buildArgs, platform, noCache) {
+  await exec.exec(`docker build -t ${imageName}:${tag} ${mapPlatform(platform)} ${mapNoCache(noCache)} ${mapBuildArgs(buildArgs)} -f ${dockerFile} ${buildPath}`);
 }
 
 const publish = async function (imageName, tag) {
@@ -37,6 +41,10 @@ const deleteTag = async function (owner, packageName, tag) {
   }
 }
 
+const deleteImage = async function (imageName, tag) {
+  await exec.exec(`docker image rm ${imageName}:${tag}`);
+}
+
 const run = async function () {
   try {
     const wantsBuild = core.getBooleanInput('build');
@@ -47,16 +55,19 @@ const run = async function () {
     const wantsPublish = core.getBooleanInput('publish');
     const wantsClean = core.getBooleanInput('clean');
     const wantsDeleteTag = core.getBooleanInput('delete-tag');
+    const wantsDeleteImage = core.getBooleanInput('delete-image');
     const tag = core.getInput('tag');
     const imageName = 'ghcr.io/' + owner.toLowerCase() + '/' + packageName;
     const buildArgs = core.getMultilineInput('build-args');
+    const platform = core.getInput('platform');
+    const noCache = core.getBooleanInput('no-cache');
 
     console.log(`Preparing for ${packageName}:${tag}...`)
 
     if (wantsBuild) {
 
       console.log(`Building ${packageName}:${tag}...`)
-      await build(dockerFile, imageName, tag, buildPath, buildArgs);
+      await build(dockerFile, imageName, tag, buildPath, buildArgs, platform, noCache);
     }
 
     if (wantsPublish) {
@@ -72,6 +83,11 @@ const run = async function () {
     if (wantsDeleteTag) {
       console.log(`Deleting tag ${packageName}:${tag}...`)
       await deleteTag(owner, imageName, tag);
+    }
+
+    if (wantsDeleteImage) {
+      console.log('Deleting image');
+      await deleteImage(imageName, tag);
     }
 
     console.log('Done');
