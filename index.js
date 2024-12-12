@@ -9,12 +9,14 @@ const mapPlatform = (platform) => platform ? `--platform ${platform}` : '';
 
 const mapNoCache = (noCache) => noCache ? '--no-cache' : '';
 
-const build = async function (dockerFile, imageName, tag, buildPath, buildArgs, platform, noCache) {
-  await exec.exec(`docker build -t ${imageName}:${tag} ${mapPlatform(platform)} ${mapNoCache(noCache)} ${mapBuildArgs(buildArgs)} -f ${dockerFile} ${buildPath}`);
+const mapExecWithSudo = (execWithSudo) => execWithSudo ? 'sudo ' : '';
+
+const build = async function (dockerFile, imageName, tag, buildPath, buildArgs, platform, noCache, execWithSudo) {
+  await exec.exec(`${mapExecWithSudo(execWithSudo)}docker build -t ${imageName}:${tag} ${mapPlatform(platform)} ${mapNoCache(noCache)} ${mapBuildArgs(buildArgs)} -f ${dockerFile} ${buildPath}`);
 }
 
-const publish = async function (imageName, tag) {
-  await exec.exec(`docker push ${imageName}:${tag}`);
+const publish = async function (imageName, tag, execWithSudo) {
+  await exec.exec(`${mapExecWithSudo(execWithSudo)}docker push ${imageName}:${tag}`);
 }
 
 const clean = async function (owner, packageName) {
@@ -61,18 +63,19 @@ const run = async function () {
     const buildArgs = core.getMultilineInput('build-args');
     const platform = core.getInput('platform');
     const noCache = core.getBooleanInput('no-cache');
+    const execWithSudo = core.getBooleanInput('exec-with-sudo', { required: false });
 
     console.log(`Preparing for ${packageName}:${tag}...`)
 
     if (wantsBuild) {
 
       console.log(`Building ${packageName}:${tag}...`)
-      await build(dockerFile, imageName, tag, buildPath, buildArgs, platform, noCache);
+      await build(dockerFile, imageName, tag, buildPath, buildArgs, platform, noCache, execWithSudo);
     }
 
     if (wantsPublish) {
       console.log(`Publishing ${packageName}:${tag}...`)
-      await publish(imageName, tag);
+      await publish(imageName, tag, execWithSudo);
     }
 
     if (wantsClean) {
