@@ -51,6 +51,10 @@ inputs:
     description: "Don't use cache for building"
     required: false
     default: false
+  exec-with-sudo:
+    description: "For executing with sudo"
+    required: false
+    default: false
 runs:
   using: 'node20'
   main: 'index.js'
