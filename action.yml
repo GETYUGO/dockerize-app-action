@@ -14,7 +14,7 @@ inputs:
   build-path:
     description: 'Build Path'
     required: true
-    default: '.'  
+    default: '.'
   publish:
     description: 'Publish'
     required: false
@@ -33,7 +33,7 @@ inputs:
   delete-tag:
     description: 'Delete tagged image'
     required: false
-    default: false  
+    default: false
   tag:
     description: 'Docker image tag'
     required: true
@@ -52,10 +52,10 @@ inputs:
     required: false
     default: false
   exec-with-sudo:
-    description: "For executing with sudo"
+    description: 'For executing with sudo'
     required: false
     default: false
 runs:
-  using: 'node20'
+  using: 'node24'
   main: 'index.js'
   # post: 'clean.js'
